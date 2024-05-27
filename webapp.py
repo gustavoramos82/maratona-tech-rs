@@ -8,10 +8,19 @@ import plotly.express as px
 
 ## Importando o datasets
 
+##Url das barragens
+
 url = 'https://raw.githubusercontent.com/gustavoramos82/maratona-tech-rs/main/Datasets%20Utilizados/Datframe-padrao-ouro.csv'
 barragem_rs = pd.read_csv(url,encoding='latin1')
 
-topicos = ['Sobre o projeto','Análise inicial','Análise por mapa']
+url2 = 'https://raw.githubusercontent.com/gustavoramos82/maratona-tech-rs/main/Datasets%20Utilizados/Reser%20barra%20grande.csv'
+reserva_defluencia = pd.read_csv(url2)
+reserva_defluencia['data'] = pd.to_datetime(reserva_defluencia['data'],format='%Y-%m-%d')
+
+url3 = 'https://raw.githubusercontent.com/gustavoramos82/maratona-tech-rs/main/Datasets%20Utilizados/Previs%C3%A3o%20Sarima%20defluencia.csv'
+previsao = pd.read_csv(url3)
+
+topicos = ['Sobre o projeto','Análise inicial','Análise por mapa','Previsão']
 
 barra_lateral = st.sidebar.empty()
 estado_sel = st.sidebar.selectbox('Selecione as opções para as base de dados ou para acessar os tópicos',
@@ -118,3 +127,23 @@ if estado_sel == topicos[2]:
     mapa_dano_po.update_layout(mapbox_style="open-street-map")
     
     st.plotly_chart(mapa_dano_po)
+    
+##  Previsão
+
+if estado_sel == topicos[3]:
+        
+        st.header('Previsão de defluencia')
+        
+        st.markdown('Agora é uma amostra de como seria as previsões, neste caso pegamos de uma varavel')
+        st.markdown('cujo objetivo é prver uma possivel inundação de reservatorio e pode mexer nas estrutra das barragens')
+        st.markdown('O escolhido foi o Barra Grande do Rio Grande do Sul e foi utiizado o modelo Sarima para previsão')
+        
+        defluencia_rio = px.line(reserva_defluencia,x='data',y='defluencia',labels={'data':'Data','defluencia':'Defluencia'},
+                                 title='Defluencia do reservatorio Barra Grande')
+        st.plotly_chart(defluencia_rio)
+        
+        st.markdown('A partir disso geramos um previsão de 30 dias')
+        
+        prev = px.line(previsao,x=previsao.index,y='predicted_mean',labels={'index':'Dia','predicted_mean':'Defluencia prevista'},
+                                 title='Previsão da defluencia do reservatorio Barra Grande')
+        st.plotly_chart(prev)
